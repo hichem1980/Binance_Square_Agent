@@ -1,0 +1,33 @@
+name: Publish Crypto Article
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run publisher
+        env:
+          BINANCE_SQUARE_API_KEY: ${{ secrets.BINANCE_SQUARE_API_KEY }}
+          BINANCE_SQUARE_POST_URL: ${{ secrets.BINANCE_SQUARE_POST_URL }}
+          MAX_POSTS_PER_DAY: "99"
+          POST_INTERVAL_MINUTES: "180"
+          REQUIRE_HUMAN_APPROVAL: "false"
+        run: python -m app.main
